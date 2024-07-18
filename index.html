@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Check-In App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #searchContainer {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        #searchInput {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #clearSearch {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 20px;
+        }
+        #attendeeList {
+            list-style-type: none;
+            padding: 0;
+        }
+        .attendee {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .attendee.checked-in {
+            background-color: #e6ffe6;
+        }
+        .check-in-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .undo-btn {
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        #downloadBtn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Event Check-In</h1>
+    <div id="searchContainer">
+        <input type="text" id="searchInput" placeholder="Search by name...">
+        <span id="clearSearch">&times;</span>
+    </div>
+    <ul id="attendeeList"></ul>
+    <button id="downloadBtn">Download Check-In Data</button>
+
+    <script>
+        const attendees = [
+            {name: "Aditya Rajendra Kaware", phone: "+919860566041", checkedIn: false, pmiId: ""},
+            {name: "Aiswarya Surapaneni", phone: "+918897314372", checkedIn: false, pmiId: ""},
+            {name: "Ajay Kumar Juluru", phone: "+919574973459", checkedIn: false, pmiId: ""},
+            {name: "Ajitabh Singh", phone: "+916367274302", checkedIn: false, pmiId: ""},
+            {name: "Akash Tiwari", phone: "+918826435700", checkedIn: false, pmiId: ""},
+            {name: "Akkina, Vinod", phone: "+918297808899", checkedIn: false, pmiId: ""},
+            {name: "alice Jessuraj", phone: "+818106818965", checkedIn: false, pmiId: ""},
+            {name: "Alok Dalal", phone: "+919930662715", checkedIn: false, pmiId: ""},
+            {name: "Anantharam Vemuri", phone: "+919989336593", checkedIn: false, pmiId: ""},
+            {name: "ANEEL KUMARREDDY NALAMALPU", phone: "+917702777696", checkedIn: false, pmiId: ""},
+            {name: "Anil Gaddam", phone: "+918328518990", checkedIn: false, pmiId: ""},
+            {name: "Anita Kata", phone: "+919966504828", checkedIn: false, pmiId: ""},
+            {name: "Anitha adiraj", phone: "+919900507286", checkedIn: false, pmiId: ""},
+            {name: "Anuradha Chanda", phone: "+919493252151", checkedIn: false, pmiId: ""},
+            {name: "Anusha Sarabu", phone: "+919502882791", checkedIn: false, pmiId: ""},
+            {name: "Appari Kasturi Rani", phone: "+919743915500", checkedIn: false, pmiId: ""},
+            {name: "Arun Kasula", phone: "+919000377735", checkedIn: false, pmiId: ""},
+            {name: "Arun mungara", phone: "+917013757368", checkedIn: false, pmiId: ""},
+            {name: "Arun Paul", phone: "+918019103175", checkedIn: false, pmiId: ""},
+            {name: "Arvind Gurha", phone: "+919640909455", checkedIn: false, pmiId: ""},
+            {name: "Arvind Juglan", phone: "+917009665700", checkedIn: false, pmiId: ""},
+            {name: "Ashok Rathi", phone: "+919810442721", checkedIn: false, pmiId: ""},
+            {name: "Ashvin Shivdas Baramade", phone: "+917066218007", checkedIn: false, pmiId: ""},
+            {name: "Ashwin Preetham Kumar", phone: "+918919674282", checkedIn: false, pmiId: ""},
+            {name: "Ataullah", phone: "+918247784476", checkedIn: false, pmiId: ""},
+            {name: "Atchuta Rajesh Sunkavalli", phone: "+919848193126", checkedIn: false, pmiId: ""},
+            {name: "Babita J", phone: "+919515119596", checkedIn: false, pmiId: ""},
+            {name: "Bala Krishna Mekala", phone: "+919866398910", checkedIn: false, pmiId: ""},
+            {name: "Balarama Krishna Varanasi", phone: "+919848057562", checkedIn: false, pmiId: ""},
+            {name: "Basava Raju", phone: "+919989937864", checkedIn: false, pmiId: ""},
+            {name: "Bhaskar Reddy G", phone: "+917755921911", checkedIn: false, pmiId: ""},
+            {name: "BHASKAR VEMANA", phone: "+919959365069", checkedIn: false, pmiId: ""},
+            {name: "BIKRAMJIT SINGH", phone: "+918197941327", checkedIn: false, pmiId: ""},
+            {name: "Bilal Ahmed Dastageer", phone: "+919949360621", checkedIn: false, pmiId: ""},
+            {name: "Boddapalli Snigdha", phone: "+919642616677", checkedIn: false, pmiId: ""},
+            {name: "Brahma Chary Padakanti", phone: "+919052345369", checkedIn: false, pmiId: ""},
+            {name: "Chaitanya Devalraju", phone: "+9989989708804", checkedIn: false, pmiId: ""},
+            {name: "Chakrapani Sevva", phone: "+919989925773", checkedIn: false, pmiId: ""},
+            {name: "Chandrasekhar Karamsetty", phone: "+919632009232", checkedIn: false, pmiId: ""},
+            {name: "Chetan Srinivas", phone: "+919100818671", checkedIn: false, pmiId: ""},
+            {name: "chirravuri venkatasatyanarayana murthy", phone: "+919849752545", checkedIn: false, pmiId: ""},
+            {name: "D S Chouhan", phone: "+917702913322", checkedIn: false, pmiId: ""},
+            {name: "D V S Pratap Kumar", phone: "+919611106850", checkedIn: false, pmiId: ""},
+            {name: "Darshit Shah", phone: "+919833067682", checkedIn: false, pmiId: ""},
+            {name: "Debopam Chakrabarti", phone: "+919866748811", checkedIn: false, pmiId: ""},
+            {name: "Deepika J", phone: "+919866758201", checkedIn: false, pmiId: ""},
+            {name: "Deepika Jillella", phone: "+919848527031", checkedIn: false, pmiId: ""},
+            {name: "Deepshikha Chakraborty", phone: "+917829472676", checkedIn: false, pmiId: ""},
+            {name: "Deepti Bethel", phone: "+918143290073", checkedIn: false, pmiId: ""},
+            {name: "Devasena Vathyam", phone: "+919959322248", checkedIn: false, pmiId: ""},
+            {name: "DEVI POPURI", phone: "+917702898964", checkedIn: false, pmiId: ""},
+            {name: "Dhanunjaya Kumar Vangaveti", phone: "+919908005199", checkedIn: false, pmiId: ""},
+            {name: "Dhanunjaya Reddy Kalvapalli", phone: "+919642001046", checkedIn: false, pmiId: ""},
+            {name: "Dheeraj", phone: "+919550456616", checkedIn: false, pmiId: ""},
+            {name: "Dilip Joseph", phone: "+919949973797", checkedIn: false, pmiId: ""},
+            {name: "Dinesh Sabnani", phone: "+919581444966", checkedIn: false, pmiId: ""},
+            {name: "DIVYASREE POPURI", phone: "+917680977258", checkedIn: false, pmiId: ""},
+            {name: "Diwakar", phone: "+919550445671", checkedIn: false, pmiId: ""},
+            {name: "Dr. GVL PRASAD", phone: "+919391362304", checkedIn: false, pmiId: ""},
+            {name: "Duplicate", phone: "+919989348878", checkedIn: false, pmiId: ""},
+            {name: "Epparla Madhusudhannaidu", phone: "+919092076631", checkedIn: false, pmiId: ""},
+            {name: "Gajender Bachula", phone: "+919866048776", checkedIn: false, pmiId: ""},
+            {name: "Gayatri Praveen Chavali", phone: "+97337761234", checkedIn: false, pmiId: ""},
+            {name: "Gokul Kolipaka", phone: "+919963479872", checkedIn: false, pmiId: ""},
+            {name: "GOPALAM SINDHU MADHAVI", phone: "+917207134476", checkedIn: false, pmiId: ""},
+            {name: "GURUDEV ANKAM", phone: "+919848189843", checkedIn: false, pmiId: ""},
+            {name: "Harikrishna Gopalakrishnan", phone: "+919618521333", checkedIn: false, pmiId: ""},
+            {name: "Harinarayanan A", phone: "+919849496014", checkedIn: false, pmiId: ""},
+            {name: "Harshit Mundada", phone: "+919985216704", checkedIn: false, pmiId: ""},
+            {name: "Hemalatha Konakonla", phone: "+919700989278", checkedIn: false, pmiId: ""},
+            {name: "Ibrahim Mohammed", phone: "+918618928069", checkedIn: false, pmiId: ""},
+            {name: "ILANGATHIR S PADMANATHAN", phone: "+917799911690", checkedIn: false, pmiId: ""},
+            {name: "Imthiyaz Gadiman", phone: "+919704762964", checkedIn: false, pmiId: ""},
+            {name: "Jagatap Rajendra Prasad", phone: "+919032339214", checkedIn: false, pmiId: ""},
+            {name: "Jaya chandra kumar Godishala", phone: "+919849798958", checkedIn: false, pmiId: ""},
+            {name: "Jayadeep Macharla", phone: "+919959886886", checkedIn: false, pmiId: ""},
+            {name: "JayaSudha Bachinappa", phone: "+919849315388", checkedIn: false, pmiId: ""},
+            {name: "Jeevi Reddy", phone: "+919949901628", checkedIn: false, pmiId: ""},
+            {name: "Joby Thampy", phone: "+919880636048", checkedIn: false, pmiId: ""},
+            {name: "Juhi Jha", phone: "+919110368824", checkedIn: false, pmiId: ""}
+        ];
+
+        const attendeeList = document.getElementById('attendeeList');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        function renderAttendees(filteredAttendees = attendees) {
+            attendeeList.innerHTML = '';
+            filteredAttendees.forEach(attendee => {
+                const li = document.createElement('li');
+                li.className = 'attendee';
+                li.innerHTML = `
+                    <span>${attendee.name} (${attendee.mobile})</span>
+                    <div>
+                        <input type="text" placeholder="PMI ID" class="pmi-id">
+                        <button class="check-in-btn">Check In</button>
+                        <button class="undo-btn" style="display:none;">Undo</button>
+                    </div>
+                `;
+                attendeeList.appendChild(li);
+
+                const checkInBtn = li.querySelector('.check-in-btn');
+                const undoBtn = li.querySelector('.undo-btn');
+                const pmiInput = li.querySelector('.pmi-id');
+
+                checkInBtn.addEventListener('click', () => {
+                    li.classList.add('checked-in');
+                    checkInBtn.style.display = 'none';
+                    undoBtn.style.display = 'inline-block';
+                    pmiInput.disabled = true;
+                    attendee.checkedIn = true;
+                    attendee.pmiId = pmiInput.value;
+                });
+
+                undoBtn.addEventListener('click', () => {
+                    li.classList.remove('checked-in');
+                    checkInBtn.style.display = 'inline-block';
+                    undoBtn.style.display = 'none';
+                    pmiInput.disabled = false;
+                    attendee.checkedIn = false;
+                    attendee.pmiId = '';
+                });
+            });
+        }
+
+        function filterAttendees() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const filteredAttendees = attendees.filter(attendee => 
+                attendee.name.toLowerCase().includes(searchTerm)
+            );
+            renderAttendees(filteredAttendees);
+        }
+
+        searchInput.addEventListener('input', filterAttendees);
+
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            filterAttendees();
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const checkedInAttendees = attendees.filter(attendee => attendee.checkedIn);
+            const csv = [
+                ['Name', 'Mobile', 'PMI ID'],
+                ...checkedInAttendees.map(attendee => [attendee.name, attendee.mobile, attendee.pmiId])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute('href', url);
+                link.setAttribute('download', 'checked_in_attendees.csv');
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+
+        renderAttendees();
+    </script>
+</body>
+</html>
